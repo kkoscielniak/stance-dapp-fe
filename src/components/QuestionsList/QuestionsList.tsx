@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAccount, useContract, useContractRead } from "wagmi";
+import { useAccount, useContractEvent, useContractRead } from "wagmi";
 import config from "../../config";
 import StanceAbi from "../../abi/Stance.json";
 
@@ -14,6 +14,15 @@ const QuestionsList = () => {
     address: config.CONTRACT_ADDRESS,
     abi: StanceAbi.abi,
     functionName: "getAllQuestions",
+  });
+ 
+  useContractEvent({
+    address: config.CONTRACT_ADDRESS, 
+    abi: StanceAbi.abi, 
+    eventName: "QuestionAsked",
+    listener(id, question, author) {
+      console.log(id, question, author);
+    }
   });
 
   useEffect(() => {
