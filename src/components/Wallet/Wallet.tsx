@@ -1,18 +1,16 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
+import connectors from "../../config/connectors";
 
 const Wallet = () => {
-  const { connect } = useConnect({
-    connector: new InjectedConnector(),
-  });
+  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const { address, isConnected } = useAccount();
 
-  const handleConnect = () => connect();
+  const handleConnect = () => connect({ connector: connectors[0] });
   const handleDisconnect = () => disconnect();
-  
+
   if (!isConnected) {
-    return (<button onClick={handleConnect}>Connect wallet</button>)
+    return <button onClick={handleConnect}>Connect wallet</button>;
   }
 
   return (

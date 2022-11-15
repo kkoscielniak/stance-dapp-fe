@@ -3,20 +3,22 @@ import { getDefaultProvider } from "ethers";
 import Wallet from "./components/Wallet/Wallet";
 import QuestionsList from "./components/QuestionsList/QuestionsList";
 import AskQuestionForm from "./components/AskQuestionForm/AskQuestionForm";
+import connectors from "./config/connectors";
 
 const client = createClient({
-  autoConnect: true,
-  provider: getDefaultProvider("http://localhost:8545"),
+  // autoConnect: true,
+  connectors,
+  provider: getDefaultProvider("goerli"),
 });
 
 function App() { 
   return (
-    <WagmiConfig client={client}>
+    <WagmiConfig client={client}> 
       <Wallet />
-      <AskQuestionForm /> 
+      <AskQuestionForm />
       <QuestionsList />
-    </WagmiConfig>
-  ); 
+    </WagmiConfig> 
+  );
 }
 
 export default App;
