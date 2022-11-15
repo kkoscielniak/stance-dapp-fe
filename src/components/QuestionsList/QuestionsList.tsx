@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAccount, useContractEvent, useContractRead } from "wagmi";
 import config from "../../config";
 import StanceAbi from "../../abi/Stance.json";
+import QuestionListItem from "./QuestionListItem";
 
 const QuestionsList = () => {
   const { isConnected } = useAccount();
@@ -9,21 +10,22 @@ const QuestionsList = () => {
   const {
     data: questions,
     isError,
-    isLoading,
+    isLoading, 
   } = useContractRead({
     address: config.CONTRACT_ADDRESS,
     abi: StanceAbi.abi,
     functionName: "getAllQuestions",
   });
- 
-  useContractEvent({
-    address: config.CONTRACT_ADDRESS, 
-    abi: StanceAbi.abi, 
-    eventName: "QuestionAsked",
+
+  useContractEvent({ 
+    address: config.CONTRACT_ADDRESS,
+    abi: StanceAbi.abi,
+    eventName: "QuestionAsked", 
     listener(id, question, author) {
       console.log(id, question, author);
-    }
+    },
   });
+
 
   useEffect(() => {
     if (isConnected) {
@@ -44,9 +46,11 @@ const QuestionsList = () => {
   }
 
   // @ts-ignore
-  if (questions.length) {
+  if (questions?.length) {
     // @ts-ignore
-    return questions.map((question) => <p>{question.question}</p>);
+    return questions.map((question, index) => (
+      <QuestionListItem question={question} id={index} />
+    ));
   }
 };
 

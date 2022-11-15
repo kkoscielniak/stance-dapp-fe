@@ -11,7 +11,7 @@ const AskQuestionForm = () => {
   const { config: contractConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
     abi: StanceAbi.abi,
-    functionName: "askQuestion",
+    functionName: "askQuestion", 
     args: [questionText],
   });
   const { data, isLoading, isSuccess, write } =
