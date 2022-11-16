@@ -1,3 +1,10 @@
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  TextField,
+} from "@mui/material";
 import React, { useState } from "react";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import StanceAbi from "../../abi/Stance.json";
@@ -11,14 +18,15 @@ const AskQuestionForm = () => {
   const { config: contractConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
     abi: StanceAbi.abi,
-    functionName: "askQuestion", 
+    functionName: "askQuestion",
     args: [questionText],
   });
+
   const { data, isLoading, isSuccess, write } =
     useContractWrite(contractConfig);
 
-  const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setQuestionText(event.currentTarget.value);
+  const handleInputChange = (event: any) => {
+    setQuestionText(event.target.value);
   };
 
   const handleSubmit = () => {
@@ -30,17 +38,34 @@ const AskQuestionForm = () => {
   }
 
   return (
-    <div style={{ margin: "10px 0" }}>
-      <input
-        type="text"
-        placeholder="ask a question to our community"
-        value={questionText}
-        onChange={handleInputChange}
-      ></input>
-      <button onClick={handleSubmit} disabled={!write}>
-        submit
-      </button>
-    </div>
+    <Card sx={{ marginTop: 2 }}>
+      <CardContent>
+        <TextField
+          fullWidth
+          label="Ask a question to the community..."
+          variant="standard"
+          value={questionText}
+          onChange={handleInputChange}
+          disabled={isLoading}
+        />
+      </CardContent>
+      <CardActions sx={{ justifyContent: "flex-end" }}>
+        <Button onClick={handleSubmit} disabled={!write || isLoading}>
+          submit
+        </Button>
+      </CardActions>
+    </Card>
+    // <div style={{ margin: "10px 0" }}>
+    //   <input
+    //     type="text"
+    //     placeholder="ask a question to our community"
+    //     value={questionText}
+    //     onChange={handleInputChange}
+    //   ></input>
+    //   <button onClick={handleSubmit} disabled={!write}>
+    //     submit
+    //   </button>
+    // </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import connectors from "../../config/connectors";
+import connectors from "../../../config/connectors";
 
 const Wallet = () => {
   const { connect } = useConnect();
