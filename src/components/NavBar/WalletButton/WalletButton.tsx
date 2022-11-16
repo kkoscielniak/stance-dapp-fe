@@ -10,7 +10,7 @@ const shortenTheAddress = (address?: string) =>
     address.length
   )}`;
 
-const WalletNavItem = () => {
+const WalletButton = () => {
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const { address, isConnected } = useAccount();
@@ -33,4 +33,4 @@ const WalletNavItem = () => {
   );
 };
 
-export default WalletNavItem;
+export default WalletButton;
