@@ -42,7 +42,7 @@ const AskQuestionForm = () => {
       <CardContent>
         <TextField
           fullWidth
-          label="Ask a question to the community..."
+          label="Ask the community..."
           variant="standard"
           value={questionText}
           onChange={handleInputChange}
@@ -55,17 +55,6 @@ const AskQuestionForm = () => {
         </Button>
       </CardActions>
     </Card>
-    // <div style={{ margin: "10px 0" }}>
-    //   <input
-    //     type="text"
-    //     placeholder="ask a question to our community"
-    //     value={questionText}
-    //     onChange={handleInputChange}
-    //   ></input>
-    //   <button onClick={handleSubmit} disabled={!write}>
-    //     submit
-    //   </button>
-    // </div>
   );
 };
 
