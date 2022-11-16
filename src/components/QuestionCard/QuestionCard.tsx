@@ -7,8 +7,9 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
+import { BigNumber } from "ethers";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
-import StanceAbi from "../../abi/Stance.json";
+import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config";
 import { QuestionType } from "../../types/Question";
 import ResultBar from "../ResultBar/ResultBar";
@@ -24,31 +25,22 @@ const QuestionCard = ({
 }: Props) => {
   const { config: positiveResponseConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
-    abi: StanceAbi.abi,
+    abi: StanceArtifact.abi,
     functionName: "respondToQuestionPositively",
-    args: [id],
+    args: [BigNumber.from(id)],
   });
 
-  const {
-    // data,
-    // isLoading,
-    // isSuccess,
-    write: respondPositively,
-  } = useContractWrite(positiveResponseConfig);
+  const { write: respondPositively } = useContractWrite(positiveResponseConfig);
 
   const { config: negativeResponseConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
-    abi: StanceAbi.abi,
+    abi: StanceArtifact.abi,
+
     functionName: "respondToQuestionNegatively",
-    args: [id],
+    args: [BigNumber.from(id)],
   });
 
-  const {
-    // data,
-    // isLoading,
-    // isSuccess,
-    write: respondNegatively,
-  } = useContractWrite(negativeResponseConfig);
+  const { write: respondNegatively } = useContractWrite(negativeResponseConfig);
 
   const handlePositiveResponseClick = () => {
     respondPositively?.();
@@ -57,7 +49,6 @@ const QuestionCard = ({
   const handleNegativeResponseClick = () => {
     respondNegatively?.();
   };
-
 
   return (
     <Card>

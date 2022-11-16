@@ -5,9 +5,9 @@ import {
   CardContent,
   TextField,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
-import StanceAbi from "../../abi/Stance.json";
+import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config";
 
 const AskQuestionForm = () => {
@@ -17,12 +17,12 @@ const AskQuestionForm = () => {
 
   const { config: contractConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
-    abi: StanceAbi.abi,
+    abi: StanceArtifact.abi,
     functionName: "askQuestion",
     args: [questionText],
   });
 
-  const { data, isLoading, isSuccess, write } =
+  const { isLoading, write } =
     useContractWrite(contractConfig);
 
   const handleInputChange = (event: any) => {
