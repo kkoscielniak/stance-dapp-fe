@@ -1,7 +1,7 @@
 import { useContractRead } from "wagmi";
 import { Unstable_Grid2 as Grid } from "@mui/material";
 import { useSnackbar } from "notistack";
-import config from "../../config";
+import config from "../../config/config";
 import { StanceArtifact } from "../../abi/Stance";
 import QuestionCard from "../QuestionCard/QuestionCard";
 

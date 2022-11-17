@@ -14,7 +14,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
-import config from "../../config";
+import config from "../../config/config";
 import SendIcon from "@mui/icons-material/Send";
 import { Box } from "@mui/system";
 

@@ -11,7 +11,7 @@ import { BigNumber } from "ethers";
 import { useSnackbar } from "notistack";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
-import config from "../../config";
+import config from "../../config/config";
 import { QuestionType } from "../../types/Question";
 import ResultBar from "../ResultBar/ResultBar";
 
