@@ -5,6 +5,7 @@ import {
   CardContent,
   TextField,
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
@@ -12,6 +13,7 @@ import config from "../../config";
 
 const AskQuestionForm = () => {
   const [questionText, setQuestionText] = useState<string>("");
+  const { enqueueSnackbar } = useSnackbar();
 
   const { config: contractConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
@@ -20,8 +22,19 @@ const AskQuestionForm = () => {
     args: [questionText],
   });
 
-  const { isLoading, write } =
-    useContractWrite(contractConfig);
+  const { isLoading, write } = useContractWrite({
+    ...contractConfig,
+    onSuccess(data) {
+      console.log("askQuestion success", data);
+      enqueueSnackbar("Question saved!");
+    },
+    onError(error) {
+      console.log("askQuestion error", error);
+      enqueueSnackbar(`An error occured: ${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
 
   const handleInputChange = (event: any) => {
     setQuestionText(event.target.value);

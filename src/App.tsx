@@ -22,7 +22,13 @@ function App() {
 
   return (
     <WagmiConfig client={client}>
-      <SnackbarProvider maxSnack={3}>
+      <SnackbarProvider
+        maxSnack={3}
+        anchorOrigin={{
+          horizontal: "right",
+          vertical: "top",
+        }}
+      >
         <NavBar />
         <Container maxWidth="md">
           {isConnected && (

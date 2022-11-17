@@ -21,10 +21,6 @@ const QuestionsList = () => {
       console.log("getAllQuestions error", error);
       enqueueSnackbar(`An error occured: ${error.message}`, {
         variant: "error",
-        anchorOrigin: {
-          horizontal: "right",
-          vertical: "top",
-        },
       });
     },
   });
