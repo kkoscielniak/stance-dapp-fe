@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { BigNumber } from "ethers";
+import { useSnackbar } from "notistack";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config";
@@ -23,6 +24,7 @@ const QuestionCard = ({
   question: { question, positiveResponsesCount, negativeResponsesCount },
   id,
 }: Props) => {
+  const { enqueueSnackbar } = useSnackbar();
   const { config: positiveResponseConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
     abi: StanceArtifact.abi,
@@ -30,7 +32,19 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { write: respondPositively } = useContractWrite(positiveResponseConfig);
+  const { write: respondPositively } = useContractWrite({
+    ...positiveResponseConfig,
+    onSuccess(data) {
+      console.log("respondToQuestionPositively success", data);
+      enqueueSnackbar("Response saved!");
+    },
+    onError(error) {
+      console.log("respondToQuestionPositively error", error);
+      enqueueSnackbar(`An error occured: ${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
 
   const { config: negativeResponseConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
@@ -40,7 +54,19 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { write: respondNegatively } = useContractWrite(negativeResponseConfig);
+  const { write: respondNegatively } = useContractWrite({
+    ...negativeResponseConfig,
+    onSuccess(data) {
+      console.log("respondToQuestionNegatively success", data);
+      enqueueSnackbar("Response saved!");
+    },
+    onError(error) {
+      console.log("respondToQuestionNegatively error", error);
+      enqueueSnackbar(`An error occured: ${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
 
   const handlePositiveResponseClick = () => {
     respondPositively?.();
