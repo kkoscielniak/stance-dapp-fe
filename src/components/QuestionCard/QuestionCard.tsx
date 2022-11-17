@@ -1,10 +1,11 @@
-import { ThumbDown, ThumbUp } from "@mui/icons-material";
+import { DateRange, MoreVert, ThumbDown, ThumbUp } from "@mui/icons-material";
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   CardMedia,
+  IconButton,
   Typography,
 } from "@mui/material";
 import { BigNumber } from "ethers";
@@ -17,6 +18,7 @@ import {
 import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config/config";
 import { QuestionType } from "../../types/Question";
+import shortenTheAddress from "../../utils/shortenTheAddress";
 import ResultBar from "../ResultBar/ResultBar";
 import ButtonWithProcessing from "../shared/ButtonWithProcessing";
 
@@ -25,8 +27,30 @@ type Props = {
   question: QuestionType;
 };
 
+const convertTimestampToDateString = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000);
+
+  const dateString = date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const timeString = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return `${dateString} | ${timeString}`;
+};
+
 const QuestionCard = ({
-  question: { question, positiveResponsesCount, negativeResponsesCount },
+  question: {
+    question,
+    author,
+    timestamp,
+    positiveResponsesCount,
+    negativeResponsesCount,
+  },
   id,
 }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -37,16 +61,19 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { data: positiveResponseData, write: respondPositively, isLoading: isMakingAgreement } =
-    useContractWrite({
-      ...positiveResponseConfig,
-      onError(error) {
-        console.log("respondToQuestionPositively error", error);
-        enqueueSnackbar(`An error occured: ${error.message}`, {
-          variant: "error",
-        });
-      },
-    });
+  const {
+    data: positiveResponseData,
+    write: respondPositively,
+    isLoading: isMakingAgreement,
+  } = useContractWrite({
+    ...positiveResponseConfig,
+    onError(error) {
+      console.log("respondToQuestionPositively error", error);
+      enqueueSnackbar(`An error occured: ${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
 
   const { isLoading: isProcessingAgreement } = useWaitForTransaction({
     hash: positiveResponseData?.hash,
@@ -70,16 +97,19 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { data: negativeResponseData, write: respondNegatively, isLoading: isMakingDisagreement } =
-    useContractWrite({
-      ...negativeResponseConfig,
-      onError(error) {
-        console.log("respondToQuestionNegatively error", error);
-        enqueueSnackbar(`An error occured: ${error.message}`, {
-          variant: "error",
-        });
-      },
-    });
+  const {
+    data: negativeResponseData,
+    write: respondNegatively,
+    isLoading: isMakingDisagreement,
+  } = useContractWrite({
+    ...negativeResponseConfig,
+    onError(error) {
+      console.log("respondToQuestionNegatively error", error);
+      enqueueSnackbar(`An error occured: ${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
 
   const { isLoading: isProcessingDisagreement } = useWaitForTransaction({
     hash: negativeResponseData?.hash,
@@ -103,10 +133,25 @@ const QuestionCard = ({
     respondNegatively?.();
   };
 
-  const isProcessing = isMakingAgreement || isProcessingAgreement || isMakingDisagreement || isProcessingDisagreement;
+  const isProcessing =
+    isMakingAgreement ||
+    isProcessingAgreement ||
+    isMakingDisagreement ||
+    isProcessingDisagreement;
 
   return (
     <Card>
+      <CardHeader
+        titleTypographyProps={{ variant: "subtitle1" }}
+        subheaderTypographyProps={{ variant: "subtitle2" }}
+        action={
+          <IconButton aria-label="settings">
+            <MoreVert />
+          </IconButton>
+        }
+        title={shortenTheAddress(author)}
+        subheader={convertTimestampToDateString(timestamp.toNumber())}
+      />
       <CardMedia
         component="img"
         height="200"
