@@ -9,11 +9,16 @@ import {
 } from "@mui/material";
 import { BigNumber } from "ethers";
 import { useSnackbar } from "notistack";
-import { useContractWrite, usePrepareContractWrite } from "wagmi";
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config/config";
 import { QuestionType } from "../../types/Question";
 import ResultBar from "../ResultBar/ResultBar";
+import ButtonWithProcessing from "../shared/ButtonWithProcessing";
 
 type Props = {
   id: number;
@@ -32,14 +37,25 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { write: respondPositively } = useContractWrite({
-    ...positiveResponseConfig,
+  const { data: positiveResponseData, write: respondPositively, isLoading: isMakingAgreement } =
+    useContractWrite({
+      ...positiveResponseConfig,
+      onError(error) {
+        console.log("respondToQuestionPositively error", error);
+        enqueueSnackbar(`An error occured: ${error.message}`, {
+          variant: "error",
+        });
+      },
+    });
+
+  const { isLoading: isProcessingAgreement } = useWaitForTransaction({
+    hash: positiveResponseData?.hash,
     onSuccess(data) {
       console.log("respondToQuestionPositively success", data);
       enqueueSnackbar("Response saved!");
     },
     onError(error) {
-      console.log("respondToQuestionPositively error", error);
+      console.log("[wait] respondToQuestionPositively error", error);
       enqueueSnackbar(`An error occured: ${error.message}`, {
         variant: "error",
       });
@@ -54,14 +70,25 @@ const QuestionCard = ({
     args: [BigNumber.from(id)],
   });
 
-  const { write: respondNegatively } = useContractWrite({
-    ...negativeResponseConfig,
+  const { data: negativeResponseData, write: respondNegatively, isLoading: isMakingDisagreement } =
+    useContractWrite({
+      ...negativeResponseConfig,
+      onError(error) {
+        console.log("respondToQuestionNegatively error", error);
+        enqueueSnackbar(`An error occured: ${error.message}`, {
+          variant: "error",
+        });
+      },
+    });
+
+  const { isLoading: isProcessingDisagreement } = useWaitForTransaction({
+    hash: negativeResponseData?.hash,
     onSuccess(data) {
       console.log("respondToQuestionNegatively success", data);
       enqueueSnackbar("Response saved!");
     },
     onError(error) {
-      console.log("respondToQuestionNegatively error", error);
+      console.log("[wait] respondToQuestionNegatively error", error);
       enqueueSnackbar(`An error occured: ${error.message}`, {
         variant: "error",
       });
@@ -75,6 +102,8 @@ const QuestionCard = ({
   const handleNegativeResponseClick = () => {
     respondNegatively?.();
   };
+
+  const isProcessing = isMakingAgreement || isProcessingAgreement || isMakingDisagreement || isProcessingDisagreement;
 
   return (
     <Card>
@@ -91,12 +120,20 @@ const QuestionCard = ({
         />
       </CardContent>
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <Button onClick={handlePositiveResponseClick} startIcon={<ThumbUp />}>
+        <ButtonWithProcessing
+          onClick={handlePositiveResponseClick}
+          startIcon={<ThumbUp />}
+          isProcessing={isProcessing}
+        >
           Agree
-        </Button>
-        <Button onClick={handleNegativeResponseClick} startIcon={<ThumbDown />}>
+        </ButtonWithProcessing>
+        <ButtonWithProcessing
+          onClick={handleNegativeResponseClick}
+          startIcon={<ThumbDown />}
+          isProcessing={isProcessing}
+        >
           Disagree
-        </Button>
+        </ButtonWithProcessing>
       </CardActions>
     </Card>
   );

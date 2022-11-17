@@ -1,9 +1,7 @@
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
-  CircularProgress,
   TextField,
 } from "@mui/material";
 import { useSnackbar } from "notistack";
@@ -16,7 +14,7 @@ import {
 import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config/config";
 import SendIcon from "@mui/icons-material/Send";
-import { Box } from "@mui/system";
+import ButtonWithProcessing from "../shared/ButtonWithProcessing";
 
 const AskQuestionForm = () => {
   const [questionText, setQuestionText] = useState<string>("");
@@ -51,7 +49,7 @@ const AskQuestionForm = () => {
       enqueueSnackbar("Question asked!");
     },
     onError(error) {
-      console.log("askQuestion.wait error", error);
+      console.log("[wait] askQuestion error", error);
       enqueueSnackbar(`An error occured: ${error.message}`, {
         variant: "error",
       });
@@ -81,28 +79,15 @@ const AskQuestionForm = () => {
         />
       </CardContent>
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Box sx={{ m: 1, position: "relative" }}>
-          <Button
-            onClick={handleSubmit}
-            disabled={!write || isLoading}
-            startIcon={<SendIcon />}
-            variant="outlined"
-          >
-            Submit
-          </Button>
-          {isLoading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-              }}
-            />
-          )}
-        </Box>
+        <ButtonWithProcessing
+          onClick={handleSubmit}
+          disabled={!write || isLoading}
+          isProcessing={isLoading}
+          startIcon={<SendIcon />}
+          variant="outlined"
+        >
+          Submit
+        </ButtonWithProcessing>
       </CardActions>
     </Card>
   );
