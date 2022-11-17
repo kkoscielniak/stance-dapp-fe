@@ -1,14 +1,15 @@
-import { createClient, WagmiConfig } from "wagmi";
+import { createClient, useAccount, WagmiConfig } from "wagmi";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { getDefaultProvider } from "ethers";
+import { Container } from "@mui/system";
+import { SnackbarProvider } from "notistack";
 import QuestionsList from "./components/QuestionsList/QuestionsList";
 import AskQuestionForm from "./components/AskQuestionForm/AskQuestionForm";
 import connectors from "./config/connectors";
 import NavBar from "./components/NavBar/NavBar";
-import { Container } from "@mui/system";
 
 const client = createClient({
   // autoConnect: true,
@@ -17,13 +18,21 @@ const client = createClient({
 });
 
 function App() {
+  const { isConnected } = useAccount();
+
   return (
     <WagmiConfig client={client}>
-      <NavBar />
-      <Container maxWidth="md">
-        <AskQuestionForm />
-        <QuestionsList />
-      </Container>
+      <SnackbarProvider maxSnack={3}>
+        <NavBar />
+        <Container maxWidth="md">
+          {isConnected && (
+            <>
+              <AskQuestionForm />
+              <QuestionsList />
+            </>
+          )}
+        </Container>
+      </SnackbarProvider>
     </WagmiConfig>
   );
 }

@@ -6,13 +6,11 @@ import {
   TextField,
 } from "@mui/material";
 import { useState } from "react";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useContractWrite, usePrepareContractWrite } from "wagmi";
 import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config";
 
 const AskQuestionForm = () => {
-  const { isConnected } = useAccount();
-
   const [questionText, setQuestionText] = useState<string>("");
 
   const { config: contractConfig } = usePrepareContractWrite({
@@ -33,10 +31,6 @@ const AskQuestionForm = () => {
     write?.();
   };
 
-  if (!isConnected) {
-    return null;
-  }
-
   return (
     <Card sx={{ marginTop: 2 }}>
       <CardContent>
@@ -51,7 +45,7 @@ const AskQuestionForm = () => {
       </CardContent>
       <CardActions sx={{ justifyContent: "flex-end" }}>
         <Button onClick={handleSubmit} disabled={!write || isLoading}>
-          submit
+          Submit
         </Button>
       </CardActions>
     </Card>
