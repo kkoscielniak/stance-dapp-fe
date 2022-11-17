@@ -15,16 +15,18 @@ import { StanceArtifact } from "../../abi/Stance";
 import config from "../../config/config";
 import SendIcon from "@mui/icons-material/Send";
 import ButtonWithProcessing from "../shared/ButtonWithProcessing";
+import { useDebounce } from "usehooks-ts";
 
 const AskQuestionForm = () => {
   const [questionText, setQuestionText] = useState<string>("");
+  const debouncedQuestionText = useDebounce(questionText, 500);
   const { enqueueSnackbar } = useSnackbar();
 
   const { config: contractConfig } = usePrepareContractWrite({
     address: config.CONTRACT_ADDRESS,
     abi: StanceArtifact.abi,
     functionName: "askQuestion",
-    args: [questionText],
+    args: [debouncedQuestionText],
   });
 
   const {
