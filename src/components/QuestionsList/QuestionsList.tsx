@@ -27,12 +27,12 @@ const QuestionsList = () => {
 
   return (
     <Grid container spacing={2} sx={{ marginTop: 2 }}>
-      {questions?.length &&
+      {questions?.length ?
         questions.map((question, index: number) => (
           <Grid xs={4} spacing={2} key={index}>
             <QuestionCard question={question} id={index} />
           </Grid>
-        ))}
+        )) : null}
     </Grid>
   );
 };

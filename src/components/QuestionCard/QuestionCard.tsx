@@ -1,23 +1,19 @@
-import { DateRange, MoreVert, ThumbDown, ThumbUp } from "@mui/icons-material";
+import { MoreVert, ThumbDown, ThumbUp } from "@mui/icons-material";
 import {
   Card,
   CardActions,
   CardContent,
   CardHeader,
-  CardMedia,
   IconButton,
   Typography,
 } from "@mui/material";
 import { BigNumber } from "ethers";
 import { useSnackbar } from "notistack";
 import {
-  useContractWrite,
-  usePrepareContractWrite,
-  useWaitForTransaction,
+  useAccount,
 } from "wagmi";
-import { StanceArtifact } from "../../abi/Stance";
-import config from "../../config/config";
-import { QuestionType } from "../../types/Question";
+import { QuestionType } from "../../types/Question"; // TODO: Remove it in favor of `abitype`
+import useCommonWrite from "../../useCommonWrite";
 import shortenTheAddress from "../../utils/shortenTheAddress";
 import ResultBar from "../ResultBar/ResultBar";
 import ButtonWithProcessing from "../shared/ButtonWithProcessing";
@@ -53,75 +49,47 @@ const QuestionCard = ({
   },
   id,
 }: Props) => {
+  const { address: ownerAddress } = useAccount();
+
+  const isOwner = author === ownerAddress;
+
   const { enqueueSnackbar } = useSnackbar();
-  const { config: positiveResponseConfig } = usePrepareContractWrite({
-    address: config.CONTRACT_ADDRESS,
-    abi: StanceArtifact.abi,
+
+  const enqueueErrorSnackbar = (error: Error) => {
+    enqueueSnackbar(`An error occured: ${error.message}`, {
+      variant: "error",
+    });
+  };
+
+  const {
+    write: respondPositively,
+    isMakingTransaction: isMakingAgreement,
+    isProcessingTransaction: isProcessingAgreement,
+  } = useCommonWrite({
     functionName: "respondToQuestionPositively",
     args: [BigNumber.from(id)],
+    isEnabled: !isOwner,
+    // onPrepareError: enqueueErrorSnackbar,
+    // onWriteError: enqueueErrorSnackbar,
+    // onWaitError: enqueueErrorSnackbar,
+    onWaitSuccess() {
+      enqueueSnackbar("Agreement saved!");
+    },
   });
 
   const {
-    data: positiveResponseData,
-    write: respondPositively,
-    isLoading: isMakingAgreement,
-  } = useContractWrite({
-    ...positiveResponseConfig,
-    onError(error) {
-      console.log("respondToQuestionPositively error", error);
-      enqueueSnackbar(`An error occured: ${error.message}`, {
-        variant: "error",
-      });
-    },
-  });
-
-  const { isLoading: isProcessingAgreement } = useWaitForTransaction({
-    hash: positiveResponseData?.hash,
-    onSuccess(data) {
-      console.log("respondToQuestionPositively success", data);
-      enqueueSnackbar("Response saved!");
-    },
-    onError(error) {
-      console.log("[wait] respondToQuestionPositively error", error);
-      enqueueSnackbar(`An error occured: ${error.message}`, {
-        variant: "error",
-      });
-    },
-  });
-
-  const { config: negativeResponseConfig } = usePrepareContractWrite({
-    address: config.CONTRACT_ADDRESS,
-    abi: StanceArtifact.abi,
-
+    write: respondNegatively,
+    isMakingTransaction: isMakingDisagreement,
+    isProcessingTransaction: isProcessingDisagreement,
+  } = useCommonWrite({
     functionName: "respondToQuestionNegatively",
     args: [BigNumber.from(id)],
-  });
-
-  const {
-    data: negativeResponseData,
-    write: respondNegatively,
-    isLoading: isMakingDisagreement,
-  } = useContractWrite({
-    ...negativeResponseConfig,
-    onError(error) {
-      console.log("respondToQuestionNegatively error", error);
-      enqueueSnackbar(`An error occured: ${error.message}`, {
-        variant: "error",
-      });
-    },
-  });
-
-  const { isLoading: isProcessingDisagreement } = useWaitForTransaction({
-    hash: negativeResponseData?.hash,
-    onSuccess(data) {
-      console.log("respondToQuestionNegatively success", data);
-      enqueueSnackbar("Response saved!");
-    },
-    onError(error) {
-      console.log("[wait] respondToQuestionNegatively error", error);
-      enqueueSnackbar(`An error occured: ${error.message}`, {
-        variant: "error",
-      });
+    isEnabled: !isOwner,
+    // onPrepareError: enqueueErrorSnackbar,
+    // onWriteError: enqueueErrorSnackbar,
+    // onWaitError: enqueueErrorSnackbar,
+    onWaitSuccess() {
+      enqueueSnackbar("Disagreement saved!");
     },
   });
 
@@ -152,11 +120,11 @@ const QuestionCard = ({
         title={shortenTheAddress(author)}
         subheader={convertTimestampToDateString(timestamp.toNumber())}
       />
-      <CardMedia
+      {/* <CardMedia
         component="img"
         height="200"
         image="https://picsum.photos/200/200"
-      />
+      /> */}
       <CardContent>
         <Typography>{question ? question : "no-title"}</Typography>
         <ResultBar
@@ -169,6 +137,7 @@ const QuestionCard = ({
           onClick={handlePositiveResponseClick}
           startIcon={<ThumbUp />}
           isProcessing={isProcessing}
+          disabled={!respondPositively}
         >
           Agree
         </ButtonWithProcessing>
@@ -176,6 +145,7 @@ const QuestionCard = ({
           onClick={handleNegativeResponseClick}
           startIcon={<ThumbDown />}
           isProcessing={isProcessing}
+          disabled={!respondNegatively}
         >
           Disagree
         </ButtonWithProcessing>
