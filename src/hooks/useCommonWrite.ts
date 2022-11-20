@@ -23,7 +23,6 @@ type UseCommonWriteOptions = {
     "nonpayable"
   >;
   args?: AbiParametersToPrimitiveTypes<AbiFunctions["inputs"]>;
-  // isEnabled: boolean;
   onPrepareError?: (error: Error) => void;
   onWriteError?: (error: Error) => void;
   onWaitError?: (error: Error) => void;
@@ -33,23 +32,25 @@ type UseCommonWriteOptions = {
 const useCommonWrite = ({
   functionName,
   args,
-  // isEnabled,
   onPrepareError,
   onWriteError,
   onWaitError,
   onWaitSuccess,
 }: UseCommonWriteOptions) => {
-  const { config: contractConfig, error: prepareError } =
-    usePrepareContractWrite({
-      address: config.CONTRACT_ADDRESS,
-      abi: StanceArtifact.abi,
-      functionName,
-      args,
-      onError(error) {
-        console.warn(`[Prepare] ${functionName} failed: ${error.message}`);
-        onPrepareError?.(error);
-      },
-    });
+  const {
+    config: contractConfig,
+    isError: isPrepareError,
+    error: prepareError,
+  } = usePrepareContractWrite({
+    address: config.CONTRACT_ADDRESS,
+    abi: StanceArtifact.abi,
+    functionName,
+    args,
+    onError(error) {
+      console.warn(`[Prepare] ${functionName} failed: ${error.message}`);
+      onPrepareError?.(error);
+    },
+  });
 
   const {
     data: transactionData,
@@ -84,6 +85,7 @@ const useCommonWrite = ({
     isProcessingTransaction,
 
     // errors:
+    isPrepareError,
     prepareError,
   };
 };

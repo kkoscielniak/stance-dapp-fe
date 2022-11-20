@@ -49,6 +49,7 @@ const QuestionCard = ({
     write: respondPositively,
     isMakingTransaction: isMakingAgreement,
     isProcessingTransaction: isProcessingAgreement,
+    isPrepareError: isPreparePositiveResponseError,
   } = useCommonWrite({
     functionName: "respondToQuestionPositively",
     args: [BigNumber.from(id)],
@@ -64,6 +65,7 @@ const QuestionCard = ({
     write: respondNegatively,
     isMakingTransaction: isMakingDisagreement,
     isProcessingTransaction: isProcessingDisagreement,
+    isPrepareError: isPrepareNegativeResponseError,
   } = useCommonWrite({
     functionName: "respondToQuestionNegatively",
     args: [BigNumber.from(id)],
@@ -115,7 +117,7 @@ const QuestionCard = ({
             onClick={handlePositiveResponseClick}
             startIcon={<ThumbUp />}
             isProcessing={isProcessing}
-            disabled={!respondPositively}
+            disabled={!respondPositively || isPreparePositiveResponseError}
           >
             Agree
           </ButtonWithProcessing>
@@ -123,7 +125,7 @@ const QuestionCard = ({
             onClick={handleNegativeResponseClick}
             startIcon={<ThumbDown />}
             isProcessing={isProcessing}
-            disabled={!respondNegatively}
+            disabled={!respondNegatively || isPrepareNegativeResponseError}
           >
             Disagree
           </ButtonWithProcessing>
