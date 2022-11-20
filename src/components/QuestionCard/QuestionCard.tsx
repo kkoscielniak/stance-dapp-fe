@@ -1,3 +1,4 @@
+import { getParsedEthersError } from "@enzoferey/ethers-error-parser";
 import { MoreVert, ThumbDown, ThumbUp } from "@mui/icons-material";
 import {
   Card,
@@ -5,38 +6,24 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { BigNumber } from "ethers";
 import { useSnackbar } from "notistack";
-import {
-  useAccount,
-} from "wagmi";
+import { useState } from "react";
 import { QuestionType } from "../../types/Question"; // TODO: Remove it in favor of `abitype`
-import useCommonWrite from "../../useCommonWrite";
-import shortenTheAddress from "../../utils/shortenTheAddress";
+import useCommonWrite from "../../hooks/useCommonWrite";
+import {
+  shortenTheAddress,
+  convertTimestampToDateString,
+} from "../../utils/textUtils";
 import ResultBar from "../ResultBar/ResultBar";
 import ButtonWithProcessing from "../shared/ButtonWithProcessing";
 
 type Props = {
   id: number;
   question: QuestionType;
-};
-
-const convertTimestampToDateString = (timestamp: number): string => {
-  const date = new Date(timestamp * 1000);
-
-  const dateString = date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const timeString = date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  return `${dateString} | ${timeString}`;
 };
 
 const QuestionCard = ({
@@ -49,16 +36,13 @@ const QuestionCard = ({
   },
   id,
 }: Props) => {
-  const { address: ownerAddress } = useAccount();
-
-  const isOwner = author === ownerAddress;
+  const [prepareError, setPrepareError] = useState<string | undefined>();
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const enqueueErrorSnackbar = (error: Error) => {
-    enqueueSnackbar(`An error occured: ${error.message}`, {
-      variant: "error",
-    });
+  const handlePrepareError = (error: Error) => {
+    const { context } = getParsedEthersError(error);
+    setPrepareError(context);
   };
 
   const {
@@ -68,10 +52,9 @@ const QuestionCard = ({
   } = useCommonWrite({
     functionName: "respondToQuestionPositively",
     args: [BigNumber.from(id)],
-    isEnabled: !isOwner,
-    // onPrepareError: enqueueErrorSnackbar,
-    // onWriteError: enqueueErrorSnackbar,
-    // onWaitError: enqueueErrorSnackbar,
+    onPrepareError(error) {
+      handlePrepareError(error);
+    },
     onWaitSuccess() {
       enqueueSnackbar("Agreement saved!");
     },
@@ -84,10 +67,9 @@ const QuestionCard = ({
   } = useCommonWrite({
     functionName: "respondToQuestionNegatively",
     args: [BigNumber.from(id)],
-    isEnabled: !isOwner,
-    // onPrepareError: enqueueErrorSnackbar,
-    // onWriteError: enqueueErrorSnackbar,
-    // onWaitError: enqueueErrorSnackbar,
+    onPrepareError(error) {
+      handlePrepareError(error);
+    },
     onWaitSuccess() {
       enqueueSnackbar("Disagreement saved!");
     },
@@ -120,11 +102,6 @@ const QuestionCard = ({
         title={shortenTheAddress(author)}
         subheader={convertTimestampToDateString(timestamp.toNumber())}
       />
-      {/* <CardMedia
-        component="img"
-        height="200"
-        image="https://picsum.photos/200/200"
-      /> */}
       <CardContent>
         <Typography>{question ? question : "no-title"}</Typography>
         <ResultBar
@@ -132,24 +109,26 @@ const QuestionCard = ({
           negativeResponsesCount={negativeResponsesCount}
         />
       </CardContent>
-      <CardActions sx={{ justifyContent: "space-between" }}>
-        <ButtonWithProcessing
-          onClick={handlePositiveResponseClick}
-          startIcon={<ThumbUp />}
-          isProcessing={isProcessing}
-          disabled={!respondPositively}
-        >
-          Agree
-        </ButtonWithProcessing>
-        <ButtonWithProcessing
-          onClick={handleNegativeResponseClick}
-          startIcon={<ThumbDown />}
-          isProcessing={isProcessing}
-          disabled={!respondNegatively}
-        >
-          Disagree
-        </ButtonWithProcessing>
-      </CardActions>
+      <Tooltip title={prepareError}>
+        <CardActions sx={{ justifyContent: "space-between" }}>
+          <ButtonWithProcessing
+            onClick={handlePositiveResponseClick}
+            startIcon={<ThumbUp />}
+            isProcessing={isProcessing}
+            disabled={!respondPositively}
+          >
+            Agree
+          </ButtonWithProcessing>
+          <ButtonWithProcessing
+            onClick={handleNegativeResponseClick}
+            startIcon={<ThumbDown />}
+            isProcessing={isProcessing}
+            disabled={!respondNegatively}
+          >
+            Disagree
+          </ButtonWithProcessing>
+        </CardActions>
+      </Tooltip>
     </Card>
   );
 };
