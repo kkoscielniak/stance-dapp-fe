@@ -4,7 +4,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 import connectors from "../../../config/connectors";
 import { Tooltip } from "@mui/material";
-import shortenTheAddress from "../../../utils/shortenTheAddress";
+import { shortenTheAddress } from "../../../utils/textUtils";
 
 const WalletButton = () => {
   const { connect } = useConnect();
