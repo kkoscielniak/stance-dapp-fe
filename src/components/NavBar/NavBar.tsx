@@ -1,9 +1,9 @@
-import { GitHub } from "@mui/icons-material";
-import { Box, Button, Divider, Tooltip } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import PrizePool from "./PrizePool/PrizePool";
+import GitHubLinkButton from "./GitHubLink/GitHubLinkButton";
+import PrizePoolButton from "./PrizePool/PrizePool";
 import WalletButton from "./WalletButton/WalletButton";
 
 const NavBar = () => {
@@ -22,13 +22,9 @@ const NavBar = () => {
             },
           }}
         >
-          <Tooltip title="Star me on GitHub">
-            <Button color="inherit" startIcon={<GitHub />}>
-              kkoscielniak/stance-dapp
-            </Button>
-          </Tooltip>
+          <GitHubLinkButton />
           <Divider orientation="vertical" flexItem />
-          <PrizePool />
+          <PrizePoolButton />
           <Divider orientation="vertical" flexItem />
           <WalletButton />
         </Box>

@@ -1,12 +1,8 @@
-import {
-  Card,
-  CardActions,
-  CardContent,
-  TextField,
-} from "@mui/material";
+import { Card, CardActions, CardContent, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 import {
+  useAccount,
   useContractWrite,
   usePrepareContractWrite,
   useWaitForTransaction,
@@ -16,8 +12,10 @@ import config from "../../config/config";
 import SendIcon from "@mui/icons-material/Send";
 import ButtonWithProcessing from "../shared/ButtonWithProcessing";
 import { useDebounce } from "usehooks-ts";
+import { ethers } from "ethers";
 
 const AskQuestionForm = () => {
+  const { address } = useAccount();
   const [questionText, setQuestionText] = useState<string>("");
   const debouncedQuestionText = useDebounce(questionText, 500);
   const { enqueueSnackbar } = useSnackbar();
@@ -27,6 +25,11 @@ const AskQuestionForm = () => {
     abi: StanceArtifact.abi,
     functionName: "askQuestion",
     args: [debouncedQuestionText],
+    overrides: {
+      from: address,
+      // @ts-ignore
+      value: ethers.utils.parseEther("0.001"),
+    },
   });
 
   const {
