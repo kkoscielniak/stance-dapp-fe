@@ -1,11 +1,10 @@
 import { getParsedEthersError } from "@enzoferey/ethers-error-parser";
-import { MoreVert, ThumbDown, ThumbUp } from "@mui/icons-material";
+import { ThumbDown, ThumbUp } from "@mui/icons-material";
 import {
   Card,
   CardActions,
   CardContent,
   CardHeader,
-  IconButton,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -96,11 +95,11 @@ const QuestionCard = ({
       <CardHeader
         titleTypographyProps={{ variant: "subtitle1" }}
         subheaderTypographyProps={{ variant: "subtitle2" }}
-        action={
-          <IconButton aria-label="settings">
-            <MoreVert />
-          </IconButton>
-        }
+        // action={
+        //   <IconButton aria-label="settings">
+        //     <MoreVert />
+        //   </IconButton>
+        // }
         title={shortenTheAddress(author)}
         subheader={convertTimestampToDateString(timestamp.toNumber())}
       />

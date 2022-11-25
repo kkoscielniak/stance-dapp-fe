@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { LinearProgress, linearProgressClasses, Tooltip } from "@mui/material";
-import calculatePositiveToNegativeRatio from "../../utils/calculatePositiveToNegativeRatio";
+import { calculatePositiveToNegativeRatio } from "../../utils/textUtils";
 
 const StyledLinearBar = styled(LinearProgress)(({ value, theme }) => ({
   height: 30,
